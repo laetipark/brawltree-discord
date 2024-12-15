@@ -11,7 +11,7 @@ const currEmbed = (currMap) => {
       name: `${config.modeIcon[currMap.MAP_MD]} ${
         config.modeKR[currMap.MAP_MD]
       }`,
-      value: currMap.MAP_NM,
+      value: currMap.MAP_NM
     })
     .toJSON();
 };
@@ -26,7 +26,7 @@ const nextEmbed = (nextMap) => {
       name: `${config.modeIcon[nextMap.MAP_MD]} ${
         config.modeKR[nextMap.MAP_MD]
       }`,
-      value: nextMap.MAP_NM,
+      value: nextMap.MAP_NM
     })
     .toJSON();
 };
@@ -46,9 +46,9 @@ export const rotationCommand = {
           { name: '녹아웃', value: 6 },
           { name: '클린 아웃', value: 10 },
           { name: '주말 이벤트', value: 33 },
-          { name: '쇼다운', value: 5 },
+          { name: '쇼다운', value: 5 }
         )
-        .setRequired(true),
+        .setRequired(true)
     )
     .toJSON(),
   async execute(interaction) {
@@ -69,5 +69,5 @@ export const rotationCommand = {
         name: `${nextMap.id}.webp`,
       }],
     });*/
-  },
+  }
 };
