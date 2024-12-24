@@ -5,7 +5,7 @@ import config from '~/config/config';
 
 export const client = async () => {
   const client = new Client({
-    intents: [GatewayIntentBits.Guilds],
+    intents: [GatewayIntentBits.Guilds]
   });
   const [commandsDefinition, commandsExecution] = commands();
   client['commands'] = commandsExecution;
@@ -15,7 +15,7 @@ export const client = async () => {
   await (async () => {
     try {
       await rest.put(Routes.applicationCommands(config.clientID), {
-        body: commandsDefinition,
+        body: commandsDefinition
       });
     } catch (error) {
       console.error(error);
@@ -36,12 +36,12 @@ export const client = async () => {
       if (interaction.replied || interaction.deferred) {
         await interaction.followUp({
           content: '해당 명령에 오류가 있습니다. 관리자에게 알려주세요! 😵',
-          ephemeral: true,
+          ephemeral: true
         });
       } else {
         await interaction.reply({
           content: '해당 명령에 오류가 있습니다. 관리자에게 알려주세요! 😵',
-          ephemeral: true,
+          ephemeral: true
         });
       }
     }
@@ -55,7 +55,7 @@ export const client = async () => {
     .catch((err) => {
       console.log(
         '🌸BLOSSOM BOT LOGIN FAILED!',
-        new Date().toLocaleString('ko-KR'),
+        new Date().toLocaleString('ko-KR')
       );
       console.log(err);
     });
