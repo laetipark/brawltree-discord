@@ -254,5 +254,6 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node,intellij,dotenv
-config/
+
 /kakao/global_modules/secret.js
+/kakao/global_modules/config.js
