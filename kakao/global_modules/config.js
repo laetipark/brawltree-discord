@@ -1,6 +1,6 @@
 const Jsoup = org.jsoup.Jsoup;
-const serverURL = '';
-const cdnURL = '';
+const serverURL = 'https://server.brawltree.me/';
+const cdnURL = 'https://cdn.brawltree.me/';
 
 const getResponse = (url) => {
   const response = Jsoup.connect(url)
@@ -12,15 +12,15 @@ const getResponse = (url) => {
 };
 
 const getENDataFromCdn = (item, file, key) => {
-  return getResponse(cdnURL + '' + file + '.json')[key][item];
+  return getResponse(cdnURL + 'database/locales/en/' + file + '.json')[key][item];
 };
 
 const getDataFromCdn = (item, file, key) => {
-  return getResponse(cdnURL + '' + file + '.json')[key][item];
+  return getResponse(cdnURL + 'database/locales/ko/' + file + '.json')[key][item];
 };
 
 const getKeyByValue = (item, file, key) => {
-  const result = getResponse(cdnURL + '' + file + '.json')[key];
+  const result = getResponse(cdnURL + 'database/locales/ko/' + file + '.json')[key];
   return Object.keys(result).find((key) => result[key].indexOf(item) > -1) || null;
 };
 

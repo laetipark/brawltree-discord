@@ -187,60 +187,67 @@ function onCommand(msg){
 
       break;
     case commandList.map.name:
+      let templateArgs;
       if(args.length === 0){
         msg.reply('상세 맵 정보를 입력해주세요. (예시 : /맵 별내림 계곡)');
       }else if(args.length > 0){
-        let typeString;
-        let modeKey, modeString;
-        let type, queryString;
-        let mapKey, mapName;
+        try{
+          let typeString;
+          let modeKey, modeString;
+          let type, queryString;
+          let mapKey, mapName;
 
-        if(args[0]){
-          mapKey = config.getKeyByValue(args[0], 'map', 'map');
-          mapName = mapKey ? config.getENDataFromCdn(mapKey, 'map', 'map') : '';
-        }
+          if(args[0]){
+            mapKey = config.getKeyByValue(args[0], 'map', 'map');
+            mapName = mapKey ? config.getENDataFromCdn(mapKey, 'map', 'map') : '';
+          }
 
-        if(mapName === ''){
-          msg.reply('맵 이름과 비슷한 정보가 없습니다.');
-          break;
-        }
-
-        if(args[1]){
-          typeString = args[1];
-        }
-
-        if(typeString === '경쟁'){
-          type = '2';
-          queryString = '&grade[]=5&grade[]=6';
-        }else{
-          type = '0';
-          queryString = '&grade[]=3&grade[]=4&grade[]=5&grade[]=6&grade[]=7';
-        }
-
-        if(args[2]){
-          if(type === '2' &&
-            ['gemGrab', 'brawlBall', 'bounty', 'heist', 'hotZone', 'knockout']
-              .indexOf(args[2]) < 0){
-            msg.reply('찾으시는 모드는 경쟁전 모드가 아닙니다.\n' +
-            '- 사용법 : /맵 [맵 이름 또는 일부] [일반|경쟁] [모드명]\n' +
-            ' * [일반|경쟁]에 다른 내용을 입력하거나 띄어쓰기 할 경우 기본값은 [일반]');
+          if(mapName === ''){
+            msg.reply('맵 이름과 비슷한 정보가 없습니다.');
             break;
           }
 
-          modeKey = config.getKeyByValue(args[2], 'battle', 'mode');
-          modeString = modeKey ? modeKey : '';
-        }
+          if(args[1]){
+            typeString = args[1];
+          }
 
-        const mapResult = (
-          getBrawlStarsApi('maps/name/detail' + '?',
-            'name=' + mapName +
-            '&type=' + type +
-            queryString +
-            (modeString ? '&mode=' + modeString : '')
-          ));
+          if(typeString === '경쟁'){
+            type = '2';
+            queryString = '&grade[]=5&grade[]=6';
+          }else{
+            type = '0';
+            queryString = '&grade[]=3&grade[]=4&grade[]=5&grade[]=6&grade[]=7';
+          }
 
-        client
-          .sendLink(
+          if(args[2]){
+            if(type === '2' &&
+              ['gemGrab', 'brawlBall', 'bounty', 'heist', 'hotZone', 'knockout']
+                .indexOf(args[2]) < 0){
+              msg.reply('찾으시는 모드는 경쟁전 모드가 아닙니다.\n' +
+                '- 사용법 : /맵 [맵 이름 또는 일부] [일반|경쟁] [모드명]\n' +
+                ' * [일반|경쟁]에 다른 내용을 입력하거나 띄어쓰기 할 경우 기본값은 [일반]');
+              break;
+            }
+
+            modeKey = config.getKeyByValue(args[2], 'battle', 'mode');
+            modeString = modeKey ? modeKey : '';
+          }
+
+          const mapResult = (
+            getBrawlStarsApi('maps/name/detail' + '?',
+              'name=' + mapName +
+              '&type=' + type +
+              queryString +
+              (modeString ? '&mode=' + modeString : '')
+            ));
+
+          const brawler1 = mapResult['stats'][0];
+          const brawler2 = mapResult['stats'][1];
+          const brawler3 = mapResult['stats'][2];
+          const brawler4 = mapResult['stats'][3];
+          const brawler5 = mapResult['stats'][4];
+
+          client.sendLink(
             room,
             {
               templateId: 115655, // your template id
@@ -251,27 +258,35 @@ function onCommand(msg){
                 mapName: config.getDataFromCdn(mapResult['map']['mapID'], 'map', 'map'),
                 mapMode: config.getDataFromCdn(mapResult['map']['mode'], 'battle', 'mode'),
                 mapType: type === '0' ? '트로피' : '경쟁전',
-                brawlerName1: config.getDataFromCdn(mapResult['stats'][0]['brawlerName'], 'brawler', 'brawler'),
-                brawlerName2: config.getDataFromCdn(mapResult['stats'][1]['brawlerName'], 'brawler', 'brawler'),
-                brawlerName3: config.getDataFromCdn(mapResult['stats'][2]['brawlerName'], 'brawler', 'brawler'),
-                brawlerName4: config.getDataFromCdn(mapResult['stats'][3]['brawlerName'], 'brawler', 'brawler'),
-                brawlerName5: config.getDataFromCdn(mapResult['stats'][4]['brawlerName'], 'brawler', 'brawler'),
-                brawlerPick1: mapResult['stats'][0]['pickRate'],
-                brawlerPick2: mapResult['stats'][1]['pickRate'],
-                brawlerPick3: mapResult['stats'][2]['pickRate'],
-                brawlerPick4: mapResult['stats'][3]['pickRate'],
-                brawlerPick5: mapResult['stats'][4]['pickRate'],
-                brawlerWin1: mapResult['stats'][0]['victoryRate'],
-                brawlerWin2: mapResult['stats'][1]['victoryRate'],
-                brawlerWin3: mapResult['stats'][2]['victoryRate'],
-                brawlerWin4: mapResult['stats'][3]['victoryRate'],
-                brawlerWin5: mapResult['stats'][4]['victoryRate']
+                brawlerName1: mapResult['stats'][0] ?
+                  config.getDataFromCdn(brawler1.brawlerName, 'brawler', 'brawler') : '',
+                brawlerPick1: mapResult['stats'][0] ? brawler1.pickRate : '0',
+                brawlerWin1: mapResult['stats'][0] ? brawler1.victory : '0',
+                brawlerName2: mapResult['stats'][1] ?
+                  config.getDataFromCdn(brawler2.brawlerName, 'brawler', 'brawler') : '',
+                brawlerPick2: mapResult['stats'][1] ? brawler2.pickRate : '0',
+                brawlerWin2: mapResult['stats'][1] ? brawler2.victory : '0',
+                brawlerName3: mapResult['stats'][2] ?
+                  config.getDataFromCdn(brawler3.brawlerName, 'brawler', 'brawler') : '',
+                brawlerPick3: mapResult['stats'][2] ? brawler3.pickRate : '0',
+                brawlerWin3: mapResult['stats'][2] ? brawler3.victory : '0',
+                brawlerName4: mapResult['stats'][3] ?
+                  config.getDataFromCdn(brawler4.brawlerName, 'brawler', 'brawler') : '',
+                brawlerPick4: mapResult['stats'][3] ? brawler4.pickRate : '0',
+                brawlerWin4: mapResult['stats'][3] ? brawler4.victory : '0',
+                brawlerName5: mapResult['stats'][4] ?
+                  config.getDataFromCdn(brawler5.brawlerName, 'brawler', 'brawler') : '',
+                brawlerPick5: mapResult['stats'][4] ? brawler5.pickRate : '0',
+                brawlerWin5: mapResult['stats'][4] ? brawler5.victory : '0'
               }
-            },
-            'custom'
-          )
-          .awaitResult();
+            }, 'custom'
+          ).awaitResult();
+
+        }catch (err){
+          Log.error(err + JSON.stringify(mapResult) + '\n' + JSON.stringify(templateArgs));
+        }
       }
+
       break;
     default:
       break;
