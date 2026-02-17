@@ -30,7 +30,7 @@ const seeAllViewText = '\u200b'.repeat(500);
  * @constructor
  * @description 명령어 리스트
  */
-function CommandList(){
+function CommandList() {
   this.bot = {
     name: '봇',
     description: '봇에 대한 소개를 합니다.\n'
@@ -41,7 +41,8 @@ function CommandList(){
   };
   this.rotation = {
     name: '이벤트',
-    description: '맵 로테이션에 대한 정보를 확인할 수 있습니다.\n' +
+    description:
+      '맵 로테이션에 대한 정보를 확인할 수 있습니다.\n' +
       ' * 기본: 현재 로테이션 정보\n' +
       ' * 다음: 다음 로테이션 정보\n',
     args: '(다음)'
@@ -53,7 +54,8 @@ function CommandList(){
   };
   this.ranking = {
     name: '랭킹',
-    description: '랭킹 정보를 확인할 수 있습니다.\n' +
+    description:
+      '랭킹 정보를 확인할 수 있습니다.\n' +
       ' * 플레이어: 플레이어 랭킹 정보를 확인할 수 있습니다.\n' +
       ' * 브롤러 [브롤러명]: 브롤러 랭킹 정보를 확인할 수 있습니다.\n' +
       ' * 클럽: 클럽 랭킹 정보를 확인할 수 있습니다.\n',
@@ -67,10 +69,10 @@ function CommandList(){
  * @param query
  * @returns {*}
  */
-function getBrawlStarsApi(url, query){
-  try{
+function getBrawlStarsApi(url, query) {
+  try {
     return config.getResponse(config.getServerURL(url + query));
-  }catch (error){
+  } catch (error) {
     Log.error(error);
     throw error;
   }
@@ -92,11 +94,9 @@ function getBrawlStarsApi(url, query){
  * (bigint) msg.logId: 각 메세지의 고유 id
  * (bigint) msg.channelId: 각 방의 고유 id
  */
-function onMessage(msg){
-}
+function onMessage(msg) {}
 
 bot.addListener(Event.MESSAGE, onMessage);
-
 
 /**
  * (string) msg.content: 메시지의 내용
@@ -112,7 +112,7 @@ bot.addListener(Event.MESSAGE, onMessage);
  * (string) msg.command: 명령어 이름
  * (Array) msg.args: 명령어 인자 배열
  */
-function onCommand(msg){
+function onCommand(msg) {
   const room = msg.room,
     author = msg.author,
     content = msg.content,
@@ -123,7 +123,7 @@ function onCommand(msg){
     isGroupChat = msg.isGroupChat,
     packageName = msg.packageName;
 
-  switch (command){
+  switch (command) {
     case commandList.bot.name:
       client
         .sendLink(
@@ -139,20 +139,26 @@ function onCommand(msg){
     case commandList.help.name:
       let cList = '';
       Object.entries(commandList).forEach(([propertyName]) => {
-        const args = commandList[propertyName].args ? ' ' + commandList[propertyName].args : '';
-        cList += '- /' + commandList[propertyName].name +
-          args + ': ' + commandList[propertyName].description + '\n';
+        const args = commandList[propertyName].args
+          ? ' ' + commandList[propertyName].args
+          : '';
+        cList +=
+          '- /' +
+          commandList[propertyName].name +
+          args +
+          ': ' +
+          commandList[propertyName].description +
+          '\n';
       });
-      const helpText = '🌸 명령어 목록\n\n' +
-        cList;
+      const helpText = '🌸 명령어 목록\n\n' + cList;
       msg.reply(helpText);
       break;
     case commandList.rotation.name:
       let type;
-      if(args.length === 0){
+      if (args.length === 0) {
         type = 'curr';
-      }else if(args.length > 0){
-        switch (args[0]){
+      } else if (args.length > 0) {
+        switch (args[0]) {
           case '다음':
             type = 'tomm';
             break;
@@ -164,11 +170,11 @@ function onCommand(msg){
 
       let timeType, timeText, typeName;
 
-      if(type === 'curr'){
+      if (type === 'curr') {
         timeType = 'endTime';
         timeText = '종료까지';
         typeName = '현재';
-      }else if(type === 'tomm'){
+      } else if (type === 'tomm') {
         timeType = 'startTime';
         timeText = '시작까지';
         typeName = '다음';
@@ -181,80 +187,112 @@ function onCommand(msg){
         const date = new Date(event[timeType].replace(' ', 'T'));
         const time = config.getCurrTimeDiff(date);
         return (
-          '[' + mode + ']' + '\n' +
-          mapName + '\n' + url + '\n' +
-          timeText + ' ' +
-          time.day + '일 ' +
-          time.hour + '시간 ' +
-          time.minute + '분'
+          '[' +
+          mode +
+          ']' +
+          '\n' +
+          mapName +
+          '\n' +
+          url +
+          '\n' +
+          timeText +
+          ' ' +
+          time.day +
+          '일 ' +
+          time.hour +
+          '시간 ' +
+          time.minute +
+          '분'
         );
       });
 
-      const rotationReplyText = '🌸 ' + typeName + '맵 로테이션 목록' +
-        seeAllViewText + '\n\n' + replyCR.join('\n\n');
+      const rotationReplyText =
+        '🌸 ' +
+        typeName +
+        '맵 로테이션 목록' +
+        seeAllViewText +
+        '\n\n' +
+        replyCR.join('\n\n');
       msg.reply(rotationReplyText);
 
       break;
     case commandList.map.name:
-      if(args.length === 0){
+      if (args.length === 0) {
         msg.reply('상세 맵 정보를 입력해주세요. (예시 : /맵 별내림 계곡)');
-      }else if(args.length > 0){
+      } else if (args.length > 0) {
         let typeString, modeString;
         let modeKey;
         let mapKey, mapName;
-        let type = '0', typeQuery = '',
-          name = '', modeName = '';
+        let type = '0',
+          typeQuery = '',
+          name = '',
+          modeName = '';
 
-        for (let i = 0; i < args.length; i++){
-          if(args[i].indexOf('?') !== -1 || args[i].indexOf('!') !== -1){
-            if(args[i].indexOf('?') !== -1){
+        for (let i = 0; i < args.length; i++) {
+          if (args[i].indexOf('?') !== -1 || args[i].indexOf('!') !== -1) {
+            if (args[i].indexOf('?') !== -1) {
               typeString = args[i].replace('?', '');
 
-              if(typeString === '경쟁'){
+              if (typeString === '경쟁') {
                 type = '2';
                 typeQuery = '&grade[]=5&grade[]=6';
-              }else{
+              } else {
                 type = '0';
-                typeQuery = '&grade[]=3&grade[]=4&grade[]=5&grade[]=6&grade[]=7';
+                typeQuery =
+                  '&grade[]=3&grade[]=4&grade[]=5&grade[]=6&grade[]=7';
               }
-            }else if(args[i].indexOf('!') !== -1){
+            } else if (args[i].indexOf('!') !== -1) {
               modeString = args[i].replace('!', '');
 
-              if(type === '2' &&
-                ['gemGrab', 'brawlBall', 'bounty', 'heist', 'hotZone', 'knockout']
-                  .indexOf(args[2]) < 0){
-                msg.reply('찾으시는 모드는 경쟁전 모드가 아닙니다.\n' +
-                  '- 사용법 : /맵 [맵 이름 또는 일부] ![일반|경쟁] ?[모드명]\n' +
-                  ' * ![일반|경쟁]에 다른 내용을 입력하거나 띄어쓰기 할 경우 기본값은 \"일반\"');
+              if (
+                type === '2' &&
+                [
+                  'gemGrab',
+                  'brawlBall',
+                  'bounty',
+                  'heist',
+                  'hotZone',
+                  'knockout'
+                ].indexOf(args[2]) < 0
+              ) {
+                msg.reply(
+                  '찾으시는 모드는 경쟁전 모드가 아닙니다.\n' +
+                    '- 사용법 : /맵 [맵 이름 또는 일부] ![일반|경쟁] ?[모드명]\n' +
+                    ' * ![일반|경쟁]에 다른 내용을 입력하거나 띄어쓰기 할 경우 기본값은 \"일반\"'
+                );
                 break;
               }
 
               modeKey = config.getKeyByValue(modeString, 'battle', 'mode');
               modeName = modeKey ? modeKey : '';
             }
-          }else{
+          } else {
             name += args[i];
           }
         }
 
-        try{
-          if(name){
+        try {
+          if (name) {
             mapKey = config.getKeyByValue(name, 'map', 'map');
-            mapName = mapKey ? config.getENDataFromCdn(mapKey, 'map', 'map') : '';
+            mapName = mapKey
+              ? config.getENDataFromCdn(mapKey, 'map', 'map')
+              : '';
           }
 
-          if(mapName === ''){
+          if (mapName === '') {
             msg.reply('맵 이름과 비슷한 정보가 없습니다.');
             break;
           }
 
-          const mapResult = (
-            getBrawlStarsApi('maps/name/detail' + '?',
-              'name=' + mapName +
-              '&type=' + type +
+          const mapResult = getBrawlStarsApi(
+            'maps/name/detail' + '?',
+            'name=' +
+              mapName +
+              '&type=' +
+              type +
               typeQuery +
-              (modeName ? ('&mode=' + modeName) : '')
-            ));
+              (modeName ? '&mode=' + modeName : '')
+          );
 
           const brawler1 = mapResult['stats'][0];
           const brawler2 = mapResult['stats'][1];
@@ -262,106 +300,180 @@ function onCommand(msg){
           const brawler4 = mapResult['stats'][3];
           const brawler5 = mapResult['stats'][4];
 
-          client.sendLink(
-            room,
-            {
-              templateId: 115655, // your template id
-              templateArgs: {
-                mapID: mapResult['map']['mapID'],
-                mapImg: config.getImageUrl(mapResult['map']['mapID'], 'maps/'),
-                mapModeImg: config.getImageUrl(mapResult['map']['mode'], 'modes/icon/'),
-                mapName: config.getKODataFromCdn(mapResult['map']['mapID'], 'map', 'map'),
-                mapMode: config.getKODataFromCdn(mapResult['map']['mode'], 'battle', 'mode'),
-                mapType: type === '2' ? '경쟁전' : '트로피',
-                brawlerName1: mapResult['stats'][0] ?
-                  config.getKODataFromCdn(brawler1.brawlerName, 'brawler', 'brawler') : '',
-                brawlerPick1: mapResult['stats'][0] ? brawler1.pickRate : '0',
-                brawlerWin1: mapResult['stats'][0] ? brawler1.victoryRate : '0',
-                brawlerName2: mapResult['stats'][1] ?
-                  config.getKODataFromCdn(brawler2.brawlerName, 'brawler', 'brawler') : '',
-                brawlerPick2: mapResult['stats'][1] ? brawler2.pickRate : '0',
-                brawlerWin2: mapResult['stats'][1] ? brawler2.victoryRate : '0',
-                brawlerName3: mapResult['stats'][2] ?
-                  config.getKODataFromCdn(brawler3.brawlerName, 'brawler', 'brawler') : '',
-                brawlerPick3: mapResult['stats'][2] ? brawler3.pickRate : '0',
-                brawlerWin3: mapResult['stats'][2] ? brawler3.victoryRate : '0',
-                brawlerName4: mapResult['stats'][3] ?
-                  config.getKODataFromCdn(brawler4.brawlerName, 'brawler', 'brawler') : '',
-                brawlerPick4: mapResult['stats'][3] ? brawler4.pickRate : '0',
-                brawlerWin4: mapResult['stats'][3] ? brawler4.victoryRate : '0',
-                brawlerName5: mapResult['stats'][4] ?
-                  config.getKODataFromCdn(brawler5.brawlerName, 'brawler', 'brawler') : '',
-                brawlerPick5: mapResult['stats'][4] ? brawler5.pickRate : '0',
-                brawlerWin5: mapResult['stats'][4] ? brawler5.victoryRate : '0'
-              }
-            }, 'custom'
-          ).awaitResult();
-
-        }catch (err){
+          client
+            .sendLink(
+              room,
+              {
+                templateId: 115655, // your template id
+                templateArgs: {
+                  mapID: mapResult['map']['mapID'],
+                  mapImg: config.getImageUrl(
+                    mapResult['map']['mapID'],
+                    'maps/'
+                  ),
+                  mapModeImg: config.getImageUrl(
+                    mapResult['map']['mode'],
+                    'modes/icon/'
+                  ),
+                  mapName: config.getKODataFromCdn(
+                    mapResult['map']['mapID'],
+                    'map',
+                    'map'
+                  ),
+                  mapMode: config.getKODataFromCdn(
+                    mapResult['map']['mode'],
+                    'battle',
+                    'mode'
+                  ),
+                  mapType: type === '2' ? '경쟁전' : '트로피',
+                  brawlerName1: mapResult['stats'][0]
+                    ? config.getKODataFromCdn(
+                        brawler1.brawlerName,
+                        'brawler',
+                        'brawler'
+                      )
+                    : '',
+                  brawlerPick1: mapResult['stats'][0] ? brawler1.pickRate : '0',
+                  brawlerWin1: mapResult['stats'][0]
+                    ? brawler1.victoryRate
+                    : '0',
+                  brawlerName2: mapResult['stats'][1]
+                    ? config.getKODataFromCdn(
+                        brawler2.brawlerName,
+                        'brawler',
+                        'brawler'
+                      )
+                    : '',
+                  brawlerPick2: mapResult['stats'][1] ? brawler2.pickRate : '0',
+                  brawlerWin2: mapResult['stats'][1]
+                    ? brawler2.victoryRate
+                    : '0',
+                  brawlerName3: mapResult['stats'][2]
+                    ? config.getKODataFromCdn(
+                        brawler3.brawlerName,
+                        'brawler',
+                        'brawler'
+                      )
+                    : '',
+                  brawlerPick3: mapResult['stats'][2] ? brawler3.pickRate : '0',
+                  brawlerWin3: mapResult['stats'][2]
+                    ? brawler3.victoryRate
+                    : '0',
+                  brawlerName4: mapResult['stats'][3]
+                    ? config.getKODataFromCdn(
+                        brawler4.brawlerName,
+                        'brawler',
+                        'brawler'
+                      )
+                    : '',
+                  brawlerPick4: mapResult['stats'][3] ? brawler4.pickRate : '0',
+                  brawlerWin4: mapResult['stats'][3]
+                    ? brawler4.victoryRate
+                    : '0',
+                  brawlerName5: mapResult['stats'][4]
+                    ? config.getKODataFromCdn(
+                        brawler5.brawlerName,
+                        'brawler',
+                        'brawler'
+                      )
+                    : '',
+                  brawlerPick5: mapResult['stats'][4] ? brawler5.pickRate : '0',
+                  brawlerWin5: mapResult['stats'][4]
+                    ? brawler5.victoryRate
+                    : '0'
+                }
+              },
+              'custom'
+            )
+            .awaitResult();
+        } catch (err) {
           Log.error(err + JSON.stringify(mapResult) + '\n');
         }
       }
       break;
     case commandList.ranking.name:
-      if(args.length === 0){
-        msg.reply('플레이어, 브롤러, 클럽 중 어떠한 랭킹을 확인하실 지 입력해주세요. (예시 : /랭킹 플레이어)');
-      }else{
-        let rankingString = args[0], brawlerString = '';
+      if (args.length === 0) {
+        msg.reply(
+          '플레이어, 브롤러, 클럽 중 어떠한 랭킹을 확인하실 지 입력해주세요. (예시 : /랭킹 플레이어)'
+        );
+      } else {
+        let rankingString = args[0],
+          brawlerString = '';
         let brawlerKOName = '';
-        let brawlerID, startIndex = 0, endIndex = 199;
+        let brawlerID,
+          startIndex = 0,
+          endIndex = 199;
         let rankingType;
 
-        if(rankingString === '플레이어'){
+        if (rankingString === '플레이어') {
           rankingType = 'players';
-        }else if(rankingString === '브롤러'){
+        } else if (rankingString === '브롤러') {
           rankingType = 'brawlers';
-        }else if(rankingString === '클럽'){
+        } else if (rankingString === '클럽') {
           rankingType = 'clubs';
-        }else{
-          msg.reply('찾으시는 랭킹 정보가 없습니다.\n' +
-            '- 사용법 : /랭킹 (플레이어|브롤러|클럽) ?[브롤러명] ![시작 등수]:[끝 등수]');
+        } else {
+          msg.reply(
+            '찾으시는 랭킹 정보가 없습니다.\n' +
+              '- 사용법 : /랭킹 (플레이어|브롤러|클럽) ?[브롤러명] ![시작 등수]:[끝 등수]'
+          );
           break;
         }
 
-        for (let i = 1; i < args.length; i++){
-          if(args[i].indexOf('?') > -1 || args[i].indexOf('!') > -1){
-            if(args[i].indexOf('?') > -1){
+        for (let i = 1; i < args.length; i++) {
+          if (args[i].indexOf('?') > -1 || args[i].indexOf('!') > -1) {
+            if (args[i].indexOf('?') > -1) {
               let brawlerName;
 
-              if(rankingType === 'clubs' || rankingType === 'players'){
-                msg.reply('/랭킹 브롤러 명령어로 입력해주세요.\n' +
-                  '- 예시 : /랭킹 브롤러 ?쉘리');
+              if (rankingType === 'clubs' || rankingType === 'players') {
+                msg.reply(
+                  '/랭킹 브롤러 명령어로 입력해주세요.\n' +
+                    '- 예시 : /랭킹 브롤러 ?쉘리'
+                );
                 return;
-              }else if(rankingType === 'brawlers'){
+              } else if (rankingType === 'brawlers') {
                 brawlerString = args[i].replace('?', '');
 
                 const brawlerList = config.getDataFromCdn('brawlers');
-                brawlerName = config.getKeyByValue(brawlerString, 'brawler', 'brawler');
+                brawlerName = config.getKeyByValue(
+                  brawlerString,
+                  'brawler',
+                  'brawler'
+                );
 
-                if(!brawlerName){
-                  msg.reply('입력하신 브롤러가 존재하지 않습니다.\n' +
-                    '- 예시 : /랭킹 브롤러 ?쉘리');
+                if (!brawlerName) {
+                  msg.reply(
+                    '입력하신 브롤러가 존재하지 않습니다.\n' +
+                      '- 예시 : /랭킹 브롤러 ?쉘리'
+                  );
                   return;
                 }
 
-                brawlerKOName = config.getKODataFromCdn(brawlerName, 'brawler', 'brawler');
-                if(brawlerName){
-                  const brawlerIndex = brawlerList.map(brawler => brawler.name).indexOf(brawlerName);
+                brawlerKOName = config.getKODataFromCdn(
+                  brawlerName,
+                  'brawler',
+                  'brawler'
+                );
+                if (brawlerName) {
+                  const brawlerIndex = brawlerList
+                    .map((brawler) => brawler.name)
+                    .indexOf(brawlerName);
                   brawlerID = brawlerList[brawlerIndex].id;
                 }
               }
-            }else if(args[i].indexOf('!') > -1){
+            } else if (args[i].indexOf('!') > -1) {
               let rankIndexString = args[i].replace('!', '');
 
-              if(rankIndexString.indexOf(':') > -1){
-                [startIndex, endIndex] = rankIndexString.split(':').map(rank => Number(rank) - 1);
-                if(isNaN(startIndex) || startIndex < 0){
+              if (rankIndexString.indexOf(':') > -1) {
+                [startIndex, endIndex] = rankIndexString
+                  .split(':')
+                  .map((rank) => Number(rank) - 1);
+                if (isNaN(startIndex) || startIndex < 0) {
                   startIndex = 0;
                 }
-                if(isNaN(endIndex) || endIndex < 0){
+                if (isNaN(endIndex) || endIndex < 0) {
                   endIndex = 199;
                 }
-              }else{
+              } else {
                 startIndex = Number(rankIndexString) - 1;
                 endIndex = Number(rankIndexString) - 1;
               }
@@ -369,30 +481,65 @@ function onCommand(msg){
           }
         }
 
-
-        if(rankingType === 'brawlers' && brawlerString === ''){
-          msg.reply('브롤러 명을 입력해주세요\n' +
-            '- 예시 : /랭킹 브롤러 ?쉘리');
+        if (rankingType === 'brawlers' && brawlerString === '') {
+          msg.reply(
+            '브롤러 명을 입력해주세요\n' + '- 예시 : /랭킹 브롤러 ?쉘리'
+          );
           break;
         }
 
-        const rankResult = (
-          getBrawlStarsApi('rankings/' + rankingType + '?',
-            'countryCode=' + 'global' +
-            (brawlerID ? ('&brawlerID=' + brawlerID) : '')
-          ));
+        const rankResult = getBrawlStarsApi(
+          'rankings/' + rankingType + '?',
+          'countryCode=' +
+            'global' +
+            (brawlerID ? '&brawlerID=' + brawlerID : '')
+        );
 
-        const rankReplyText = rankResult.items.map((player) => {
-          return '[' + player.rank + '] : ' + player.name + '\n' +
-            '- 태그 : ' + player['tag'] + '\n' +
-            '- 트로피 : ' + player.trophies + '\n' +
-            (rankingType === 'clubs' ? '- 멤버 수 : ' + player.memberCount + '\n' : '') +
-            (['players', 'brawlers'].indexOf(rankingType) ? '- 프로필 : ' + 'https://brawltree.me/brawlian/' + player['tag'].replace('#', '') + '\n' : '');
-        }).slice(startIndex, endIndex + 1).reverse();
-        msg.reply('🌸 ' + rankingString + (brawlerKOName ? ' ' + brawlerKOName : '') +
-          ' 랭킹' + '(' + (startIndex === endIndex ? (startIndex + 1) : (startIndex + 1) + ' ~ ' + (endIndex + 1)) + ')' + '\n' +
-          '* 기준 : ' + rankResult.date + '\n' +
-          seeAllViewText + '\n\n' + rankReplyText.join('\n\n'));
+        const rankReplyText = rankResult.items
+          .map((player) => {
+            return (
+              '[' +
+              player.rank +
+              '] : ' +
+              player.name +
+              '\n' +
+              '- 태그 : ' +
+              player['tag'] +
+              '\n' +
+              '- 트로피 : ' +
+              player.trophies +
+              '\n' +
+              (rankingType === 'clubs'
+                ? '- 멤버 수 : ' + player.memberCount + '\n'
+                : '') +
+              (['players', 'brawlers'].indexOf(rankingType)
+                ? '- 프로필 : ' +
+                  'https://brawltree.me/brawlian/' +
+                  player['tag'].replace('#', '') +
+                  '\n'
+                : '')
+            );
+          })
+          .slice(startIndex, endIndex + 1)
+          .reverse();
+        msg.reply(
+          '🌸 ' +
+            rankingString +
+            (brawlerKOName ? ' ' + brawlerKOName : '') +
+            ' 랭킹' +
+            '(' +
+            (startIndex === endIndex
+              ? startIndex + 1
+              : startIndex + 1 + ' ~ ' + (endIndex + 1)) +
+            ')' +
+            '\n' +
+            '* 기준 : ' +
+            rankResult.date +
+            '\n' +
+            seeAllViewText +
+            '\n\n' +
+            rankReplyText.join('\n\n')
+        );
       }
       break;
 
@@ -404,33 +551,26 @@ function onCommand(msg){
 bot.setCommandPrefix('/'); // /로 시작하는 메시지를 command로 판단
 bot.addListener(Event.COMMAND, onCommand);
 
-function onCreate(savedInstanceState, activity){
+function onCreate(savedInstanceState, activity) {
   const textView = new android.widget.TextView(activity);
   textView.setText('Hello, World!');
   textView.setTextColor(android.graphics.Color.DKGRAY);
   activity.setContentView(textView);
 }
 
-function onStart(activity){
-}
+function onStart(activity) {}
 
-function onResume(activity){
-}
+function onResume(activity) {}
 
-function onPause(activity){
-}
+function onPause(activity) {}
 
-function onStop(activity){
-}
+function onStop(activity) {}
 
-function onRestart(activity){
-}
+function onRestart(activity) {}
 
-function onDestroy(activity){
-}
+function onDestroy(activity) {}
 
-function onBackPressed(activity){
-}
+function onBackPressed(activity) {}
 
 bot.addListener(Event.Activity.CREATE, onCreate);
 bot.addListener(Event.Activity.START, onStart);
