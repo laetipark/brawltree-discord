@@ -1,6 +1,6 @@
 # Blossom-Bot
 
-![Blossom Bot — Discord에서 만나는 브롤스타즈 정보](images/blossom-banner.png)
+![Blossom Discord 아이콘과 Blossom Bot 이름을 배치한 소개 배너](images/blossom-banner.png)
 
 <img alt="Blossom Icon" src="./images/blossom_discord_logo.png" width="400"/>
 
