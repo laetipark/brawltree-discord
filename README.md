@@ -1,5 +1,7 @@
 # Blossom-Bot
 
+![Blossom Bot — Discord에서 만나는 브롤스타즈 정보](images/blossom-banner.png)
+
 <img alt="Blossom Icon" src="./images/blossom_discord_logo.png" width="400"/>
 
 ![Node.js](https://img.shields.io/badge/Node.js-v19.2.0-DDDDDD?style=flat&logo=Node.js&logoColor=FFFFFF&labelColor=339933)
